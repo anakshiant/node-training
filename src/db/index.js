@@ -6,29 +6,25 @@ const sequelize = new Sequelize({
   port: 5432,
   username: "admin",
   password: "password",
-  database: "hermes",
+  database: "application",
+  sync: true,
 });
 
-const MasterKey = sequelize.define(
-  "master_keys",
-  {
-    masterKey: {
-      defaultValue: "master_key",
-      allowNull: false,
-      type: DataTypes.STRING,
-    },
-  },
-  { createdAt: false, updatedAt: false }
-);
+const movies = require("./models/movie")(sequelize);
+const users = require("./models/users")(sequelize);
 
-exports.init = async function () {
+const init = async function () {
   try {
     await sequelize.authenticate();
-
-    const data = await MasterKey.findAll({});
-
-    console.log("db > init > data", data);
+    await sequelize.sync({ alter: true });
   } catch (error) {
     console.log("db > init > ", error);
   }
+};
+
+module.exports = {
+  init,
+  users,
+  movies,
+  sequelize,
 };

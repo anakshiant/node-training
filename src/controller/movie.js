@@ -1,28 +1,55 @@
-let movies = ["sholay", "gangs of wasyepur"];
+const { sequelize } = require("../db/index");
 
 function Init(app) {
   app.get("/movie", async function (request, response) {
-    const user = request.user;
-    response.status(200).send({ movies });
+    const movies = await sequelize.models.movies.findAll({});
+    response.status(200).send(movies);
   });
 
   app.get("/movie/:id", async function (request, response) {
     const { id } = request.params;
-    const movie = movies[id];
+    const movie = await sequelize.models.movies.findOne({ id });
     response.send({ movie });
   });
 
   app.delete("/movie/:id", async function (request, response) {
     const { id } = request.params;
-    movies = movies.filter((_, index) => index != id);
-    response.send({ name: movies });
+    const movie = await sequelize.models.movies.findOne({ id });
+    const dest=await movie.destroy()
+    response.send({ dest });
   });
 
-  app.post("/movie",async function (request, response) {
+  app.post("/movie", async function (request, response) {
     const { body } = request;
-    movies.push(body.name);
-    response.status(201).send({ name: body.name });
+    const { name, language, quality, rating } = body;
+
+    const createdMovie = await sequelize.models.movies.create({
+      movie_name: name,
+      language,
+      quality,
+      rating,
+    });
+    response.status(201).send(createdMovie);
   });
+
+  app.put("/movie/:id", async function (request, response) {
+    const { id } = request.params;
+    const movie = await sequelize.models.movies.findOne({ id });
+
+    const { body } = request;
+    const { name, language, quality, rating } = body;
+    
+    movie.movie_name = name ? name : movie.name;
+    movie.language = language ? language : movie.language;
+    movie.quality = quality ? quality : movie.quality;
+    movie.rating = rating ? rating : movie.rating;
+    
+   
+// the name is still "Jane" in the database
+    await movie.save();
+
+    response.status(200).send(movie);
+  })
 }
 
 module.exports = {

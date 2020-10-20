@@ -1,6 +1,7 @@
 const { request } = require("express");
 const express = require("express");
 const movieController = require("./controller/movie");
+const userController = require("./controller/user");
 const db = require("./db/index");
 
 const PORT = 3100;
@@ -10,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 
 movieController.Init(app);
+userController.Init(app);
 
 db.init().then(console.log).catch(console.log);
 
