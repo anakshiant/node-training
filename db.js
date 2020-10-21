@@ -1,4 +1,5 @@
 const { Sequelize, Op, Model, DataTypes } = require("sequelize");
+
 const sequelize = new Sequelize("sqlite::memory:");
 
 const User = sequelize.define(
@@ -8,10 +9,11 @@ const User = sequelize.define(
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate:{
+      validate: {
         max: 4,
-        isEmail: true
-      }
+        isEmail: true,
+      },
+      
     },
     lastName: {
       type: DataTypes.STRING,
